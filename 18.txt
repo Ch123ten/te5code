@@ -1,0 +1,41 @@
+/*create table student( roll number,name varchar(20),attendance number,status varchar(20));
+ insert into student values (32,'sau',89,'Not Detained');
+ insert into student values (36,'sl',59,'Detained');*/
+
+DECLARE
+    v_roll_number number;
+    v_attendance number;
+    v_status varchar(20);
+BEGIN
+    -- Accepting roll number from the user
+    DBMS_OUTPUT.PUT('Enter Roll Number: ');
+    v_roll_number:=&v_roll_number;
+
+    -- Fetching attendance and status for the given roll number
+    SELECT attendance,status
+    INTO v_attendance, v_status
+    FROM student
+    WHERE roll = v_roll_number;
+
+    -- Checking attendance and updating status
+    IF v_attendance < 75 THEN
+        DBMS_OUTPUT.PUT_LINE('Term not granted');
+        v_status := 'Detained';
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Term granted');
+        v_status := 'Not Detained';
+    END IF;
+
+    -- Updating status in the Stud table
+    UPDATE student
+    SET status = v_status
+    WHERE roll = v_roll_number;
+
+    DBMS_OUTPUT.PUT_LINE('Status updated successfully.');
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Roll number not found.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/

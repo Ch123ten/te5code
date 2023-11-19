@@ -1,0 +1,41 @@
+/*
+create table borrower(rollin number(5), name char(20), dateofissue date, nameofbook char(20), status char(1));
+create table fine(rollno number(5), fdate date, amt number(10));
+
+insert into borrower values(10, 'om',date '2023-10-20', 'DBMS', 'I');
+insert into borrower values(20, 'chinmay',date '2023-09-08', 'CNS', 'I');
+insert into borrower values(30, 'chetan',date '2023-08-06', 'SPOS', 'I');
+insert into borrower values(40, 'samyak',date '2023-10-15', 'DELD', 'I');
+insert into borrower values(50, 'yuvraj',date '2023-10-12', 'FDS', 'I');
+*/
+
+Declare
+vroll borrower.rollin%type;
+vbookname borrower.nameofbook%type;
+vissuedate date;
+vstatus char(1);
+vfineamt number(10);
+vdaysdiff number;
+
+begin
+vroll := &roll_no;
+vbookname := '&book_name';
+select dateofissue, status into vissuedate,vstatus from borrower where rollin=vroll and nameofbook=vbookname;
+vdaysdiff := trunc(sysdate)-trunc(vissuedate);
+
+if vdaysdiff between 15 and 30 then
+	vfineamt := 5*vdaysdiff;
+elsif vdaysdiff>30 then
+	vfineamt := 50*vdaysdiff;
+else
+	vfineamt := 0;
+end if;
+
+if vstatus = 'I' then
+	update borrower set status='R' where rollin=vroll and nameofbook=vbookname;
+	if vfineamt >0 then
+		insert into fine values(vroll, sysdate, vfineamt);
+	end if;
+end if;
+end;
+/

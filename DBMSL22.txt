@@ -1,0 +1,59 @@
+-- Assuming Library and Library_Audit tables have the necessary columns
+
+-- Create Library_Audit table if not exists
+CREATE TABLE Library_Audit (
+    audit_id NUMBER PRIMARY KEY,
+    operation VARCHAR2(10),
+    book_id NUMBER,
+    old_title VARCHAR2(255),
+    old_author VARCHAR2(255),
+    old_publish_date DATE
+);
+
+-- Create a sequence for generating unique audit IDs
+CREATE SEQUENCE audit_seq START WITH 1;
+
+-- Create Before Update Trigger
+CREATE OR REPLACE TRIGGER before_update_library
+BEFORE UPDATE ON Library
+FOR EACH ROW
+BEGIN
+    -- Check if the title, author, or publish_date are being updated
+    IF :OLD.title != :NEW.title OR :OLD.author != :NEW.author OR :OLD.publish_date != :NEW.publish_date THEN
+        -- Insert the old values into Library_Audit table
+        INSERT INTO Library_Audit (audit_id, operation, book_id, old_title, old_author, old_publish_date)
+        VALUES (audit_seq.NEXTVAL, 'UPDATE', :OLD.book_id, :OLD.title, :OLD.author, :OLD.publish_date);
+    END IF;
+END;
+/
+
+-- Create Before Delete Trigger
+CREATE OR REPLACE TRIGGER before_delete_library
+BEFORE DELETE ON Library
+FOR EACH ROW
+BEGIN
+    -- Insert the old values into Library_Audit table before deletion
+    INSERT INTO Library_Audit (audit_id, operation, book_id, old_title, old_author, old_publish_date)
+    VALUES (audit_seq.NEXTVAL, 'DELETE', :OLD.book_id, :OLD.title, :OLD.author, :OLD.publish_date);
+END;
+/
+
+-- Create After Update Trigger
+CREATE OR REPLACE TRIGGER after_update_library
+AFTER UPDATE ON Library
+FOR EACH ROW
+BEGIN
+    -- Additional actions after the update if needed
+    NULL;
+END;
+/
+
+-- Create After Delete Trigger
+CREATE OR REPLACE TRIGGER after_delete_library
+AFTER DELETE ON Library
+FOR EACH ROW
+BEGIN
+    -- Additional actions after the delete if needed
+    NULL;
+END;
+/

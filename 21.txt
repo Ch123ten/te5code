@@ -1,0 +1,28 @@
+SET SERVEROUT ON
+SET VERIFY OFF
+CREATE OR REPLACE FUNCTION Age_calc(dat IN DATE, d IN OUT NUMBER, m IN OUT NUMBER) 
+RETURN NUMBER AS
+    y NUMBER;
+BEGIN
+    d := TRUNC(sysdate - dat);
+    y := d / 365;
+    y := TRUNC(y);
+    m := (d - y * 365) / 30;
+    m := TRUNC(m);
+    d := TRUNC(d - y * 365 - m * 30);
+    RETURN y;
+END;
+/
+
+DECLARE
+    D VARCHAR2(20) := 'r';
+    P1 NUMBER := &day_of_birth;
+    P2 NUMBER := &month_of_birth;
+    P3 NUMBER := &year_of_birth;
+BEGIN
+    D := TO_CHAR(P1) || '-' || TO_CHAR(P2) || '-' || TO_CHAR(P3);
+    P1 := Age_calc(TO_DATE(D, 'DD-MM-YYYY'), P2, P3);
+    DBMS_OUTPUT.PUT_LINE('DAYS: ' || P2 || ' MONTHS: ' || P3 || ' YEARS: ' || P1);
+END;
+/
+

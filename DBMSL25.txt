@@ -1,0 +1,89 @@
+php
+
+<?php
+// MongoDB connection
+$mongoClient = new MongoDB\Client("mongodb://localhost:27017");
+$database = $mongoClient->selectDatabase('your_database_name');
+$collection = $database->selectCollection('your_collection_name');
+
+// CRUD operations
+// Insert
+$dataToInsert = ['key' => 'value'];
+$collection->insertOne($dataToInsert);
+
+// Read
+$cursor = $collection->find();
+foreach ($cursor as $document) {
+    var_dump($document);
+}
+
+// Update
+$filter = ['key' => 'value'];
+$update = ['$set' => ['key' => 'new_value']];
+$collection->updateOne($filter, $update);
+
+// Delete
+$collection->deleteOne($filter);
+?>
+
+
+
+python
+
+from pymongo import MongoClient
+
+# MongoDB connection
+client = MongoClient('mongodb://localhost:27017')
+database = client['your_database_name']
+collection = database['your_collection_name']
+
+# CRUD operations
+# Insert
+data_to_insert = {'key': 'value'}
+collection.insert_one(data_to_insert)
+
+# Read
+cursor = collection.find()
+for document in cursor:
+    print(document)
+
+# Update
+filter_query = {'key': 'value'}
+update_query = {'$set': {'key': 'new_value'}}
+collection.update_one(filter_query, update_query)
+
+# Delete
+collection.delete_one(filter_query)
+
+
+java
+
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+// MongoDB connection
+MongoClient mongoClient = new MongoClient("localhost", 27017);
+MongoDatabase database = mongoClient.getDatabase("your_database_name");
+MongoCollection<Document> collection = database.getCollection("your_collection_name");
+
+// CRUD operations
+// Insert
+Document documentToInsert = new Document("key", "value");
+collection.insertOne(documentToInsert);
+
+// Read
+MongoCursor<Document> cursor = collection.find().iterator();
+while (cursor.hasNext()) {
+    System.out.println(cursor.next());
+}
+
+// Update
+Document filter = new Document("key", "value");
+Document update = new Document("$set", new Document("key", "new_value"));
+collection.updateOne(filter, update);
+
+// Delete
+collection.deleteOne(filter);

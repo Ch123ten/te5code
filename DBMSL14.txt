@@ -1,0 +1,137 @@
+// Creating the Employee collection
+db.createCollection("Employee")
+
+// Inserting documents into the Employee collection
+db.Employee.insertMany([
+    {
+        Name: { FName: "John", LName: "Doe" },
+        CompanyName: "Infosys",
+        Salary: 55000,
+        Designation: "Programmer",
+        Age: 28,
+        Expertise: ["Java", "Python", "MongoDB"],
+        DOB: "1995-05-15",
+        Email: "john.doe@example.com",
+        Contact: "1234567890",
+        Address: [
+            { PAddr: "123 Main St", LAddr: "Apt 45", City: "Pune", Pin_code: "411001" },
+            { PAddr: "456 Park Ave", LAddr: "Suite 12", City: "Mumbai", Pin_code: "400001" }
+        ]
+    },
+    // Insert more documents as needed
+    // ...
+]);
+
+// MapReduce Operations
+
+// 1. Display the total salary of per company
+var mapFunction1 = function () {
+    emit(this.CompanyName, this.Salary);
+};
+
+var reduceFunction1 = function (key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction1,
+    reduceFunction1,
+    { out: "totalSalaryPerCompany" }
+);
+
+// 2. Display the total salary of company Name:"TCS"
+var mapFunction2 = function () {
+    if (this.CompanyName === "TCS") {
+        emit(this.CompanyName, this.Salary);
+    }
+};
+
+var reduceFunction2 = function (key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction2,
+    reduceFunction2,
+    { out: "totalSalaryTCS" }
+);
+
+// 3. Return the average salary of the company whose address is “Pune".
+var mapFunction3 = function () {
+    if (this.Address) {
+        this.Address.forEach(function (address) {
+            if (address.City === "Pune") {
+                emit(this.CompanyName, this.Salary);
+            }
+        });
+    }
+};
+
+var reduceFunction3 = function (key, values) {
+    var sum = Array.sum(values);
+    return sum / values.length;
+};
+
+db.Employee.mapReduce(
+    mapFunction3,
+    reduceFunction3,
+    { out: "averageSalaryPuneCompany" }
+);
+
+// 4. Display total count for “City=Pune”
+var mapFunction4 = function () {
+    if (this.Address) {
+        this.Address.forEach(function (address) {
+            if (address.City === "Pune") {
+                emit("Pune", 1);
+            }
+        });
+    }
+};
+
+var reduceFunction4 = function (key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction4,
+    reduceFunction4,
+    { out: "totalCountPuneCity" }
+);
+
+// 5. Return count for city Pune and age greater than 40.
+var mapFunction5 = function () {
+    if (this.Address && this.Age > 40) {
+        this.Address.forEach(function (address) {
+            if (address.City === "Pune") {
+                emit("Pune", 1);
+            }
+        });
+    }
+};
+
+var reduceFunction5 = function (key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction5,
+    reduceFunction5,
+    { out: "countPuneCityAgeGreaterThan40" }
+);
+
+// Print the results
+print("Total Salary Per Company:");
+db.totalSalaryPerCompany.find().forEach(printjson);
+
+print("\nTotal Salary of TCS:");
+db.totalSalaryTCS.find().forEach(printjson);
+
+print("\nAverage Salary of Companies in Pune:");
+db.averageSalaryPuneCompany.find().forEach(printjson);
+
+print("\nTotal Count for Pune City:");
+db.totalCountPuneCity.find().forEach(printjson);
+
+print("\nCount for Pune City and Age > 40:");
+db.countPuneCityAgeGreaterThan40.find().forEach(printjson);

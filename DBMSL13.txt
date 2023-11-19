@@ -1,0 +1,95 @@
+// Creating the Employee collection
+db.createCollection("Employee")
+
+// Inserting documents into the Employee collection
+db.Employee.insertMany([
+    {
+        Emp_id: 1,
+        Name: { FName: "John", LName: "Doe" },
+        CompanyName: "Infosys",
+        Salary: 55000,
+        Designation: "Programmer",
+        Age: 28,
+        Expertise: ["Java", "Python", "MongoDB"],
+        DOB: "1995-05-15",
+        Email: "john.doe@example.com",
+        Contact: "1234567890",
+        Address: [
+            { PAddr: "123 Main St", LAddr: "Apt 45", City: "Pune", Pin_code: "411001" },
+            { PAddr: "456 Park Ave", LAddr: "Suite 12", City: "Mumbai", Pin_code: "400001" }
+        ]
+    },
+    // Insert more documents as needed
+    // ...
+]);
+
+// Aggregation Queries
+
+// 1. Return separates value in the Expertise array and return the sum of each element of the array.
+db.Employee.aggregate([
+    {
+        $unwind: "$Expertise"
+    },
+    {
+        $group: {
+            _id: "$Expertise",
+            total: { $sum: 1 }
+        }
+    }
+]);
+
+// 2. Return Max and Min Salary for each company.
+db.Employee.aggregate([
+    {
+        $group: {
+            _id: "$CompanyName",
+            maxSalary: { $max: "$Salary" },
+            minSalary: { $min: "$Salary" }
+        }
+    }
+]);
+
+// 3. Find Employee with Total Salary for Each City with Designation="DBA".
+db.Employee.aggregate([
+    {
+        $match: { Designation: "DBA" }
+    },
+    {
+        $group: {
+            _id: "$Address.City",
+            totalSalary: { $sum: "$Salary" }
+        }
+    }
+]);
+
+// 4. Return separates value in the Expertise array for an employee named Swapnil Jadhav.
+db.Employee.aggregate([
+    {
+        $match: { "Name.FName": "Swapnil", "Name.LName": "Jadhav" }
+    },
+    {
+        $unwind: "$Expertise"
+    },
+    {
+        $group: {
+            _id: "$_id",
+            expertise: { $push: "$Expertise" }
+        }
+    }
+]);
+
+// Indexing
+
+// 5. Create Compound Indexes on Name: 1, Age: -1
+db.Employee.createIndex({ "Name.FName": 1, "Name.LName": 1, Age: -1 });
+
+// 6. Create an Index on Emp_id field, compare the time required to search Emp_id before and after creating an index. (Hint: Add at least 10000 Documents)
+// Before creating an index
+db.Employee.find({ Emp_id: 1000 });
+
+// After creating an index
+db.Employee.createIndex({ Emp_id: 1 });
+db.Employee.find({ Emp_id: 1000 });
+
+// 7. Return a List of Indexes created on the employee Collection.
+db.Employee.getIndexes();

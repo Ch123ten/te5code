@@ -1,0 +1,19 @@
+-- Assuming there is a column named "salary" in the CUSTOMERS table
+
+-- Create or replace the row-level trigger
+CREATE OR REPLACE TRIGGER customers_salary_trigger
+BEFORE INSERT OR UPDATE OR DELETE ON CUSTOMERS
+FOR EACH ROW
+DECLARE
+    v_old_salary NUMBER;
+    v_new_salary NUMBER;
+BEGIN
+    IF INSERTING OR UPDATING THEN
+        -- Display salary difference for INSERT or UPDATE operations
+        DBMS_OUTPUT.PUT_LINE('Salary Difference (Old -> New): ' || TO_CHAR(:OLD.salary) || ' -> ' || TO_CHAR(:NEW.salary));
+    ELSIF DELETING THEN
+        -- Display the salary being deleted for DELETE operation
+        DBMS_OUTPUT.PUT_LINE('Salary Being Deleted: ' || TO_CHAR(:OLD.salary));
+    END IF;
+END;
+/

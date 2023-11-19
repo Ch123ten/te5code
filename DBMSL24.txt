@@ -1,0 +1,33 @@
+-- Assuming there is a column named "Emp_salary" in the Emp table
+
+-- Create the Tracking table if not exists
+CREATE TABLE Tracking (
+    Emp_no NUMBER,
+    Emp_salary NUMBER
+);
+
+-- Create or replace the AFTER trigger
+CREATE OR REPLACE TRIGGER emp_salary_trigger
+AFTER INSERT OR UPDATE OR DELETE ON Emp
+FOR EACH ROW
+DECLARE
+    v_new_salary NUMBER;
+BEGIN
+    IF INSERTING OR UPDATING THEN
+        -- Check if the new salary is less than Rs. 50,000
+        IF :NEW.Emp_salary < 50000 THEN
+            -- Insert the new values into the Tracking table
+            INSERT INTO Tracking (Emp_no, Emp_salary)
+            VALUES (:NEW.Emp_no, :NEW.Emp_salary);
+            
+            DBMS_OUTPUT.PUT_LINE('New Values Inserted into Tracking Table for Emp_no=' || :NEW.Emp_no);
+        END IF;
+    END IF;
+
+    -- Additional actions for DELETE operation if needed
+    IF DELETING THEN
+        -- Additional actions for DELETE operation if needed
+        NULL;
+    END IF;
+END;
+/

@@ -1,0 +1,58 @@
+// Creating the Employee collection
+db.createCollection("Employee")
+
+// Inserting documents into the Employee collection
+db.Employee.insertMany([
+    {
+        Name: { FName: "John", LName: "Doe" },
+        CompanyName: "Infosys",
+        Salary: 35000,
+        Designation: "Programmer",
+        Age: 28,
+        Expertise: ["Java", "Python", "MongoDB"],
+        DOB: "1995-05-15",
+        Email: "john.doe@example.com",
+        Contact: "1234567890",
+        Address: [
+            { PAddr: "123 Main St", LAddr: "Apt 45" },
+            { PAddr: "456 Park Ave", LAddr: "Suite 12" }
+        ]
+    },
+    // Insert more documents as needed
+    // ...
+]);
+
+// Queries
+
+// 1. Select all documents where Designation is "Programmer" and Salary is greater than 30000.
+db.Employee.find({
+    Designation: "Programmer",
+    Salary: { $gt: 30000 }
+});
+
+// 2. Create a new document if no document in the employee collection contains {Designation: "Tester", CompanyName: "TCS", Age: 25}.
+db.Employee.updateOne(
+    { Designation: "Tester", CompanyName: "TCS", Age: 25 },
+    { $setOnInsert: { /* document fields */ } },
+    { upsert: true }
+);
+
+// 3. Increase salary of each Employee working with “Infosys” 10000.
+db.Employee.updateMany(
+    { CompanyName: "Infosys" },
+    { $inc: { Salary: 10000 } }
+);
+
+// 4. Find all employees working with "TCS" and reduce their salary by 5000.
+db.Employee.updateMany(
+    { CompanyName: "TCS" },
+    { $inc: { Salary: -5000 } }
+);
+
+// 5. Return documents where Designation is not equal to "Tester".
+db.Employee.find({ Designation: { $ne: "Tester" } });
+
+// 6. Find all employees with an exact match on an array having Expertise: ['MongoDB', 'Mysql', 'Cassandra'].
+db.Employee.find({
+    Expertise: { $all: ['MongoDB', 'Mysql', 'Cassandra'] }
+});

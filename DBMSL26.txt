@@ -1,0 +1,116 @@
+php
+
+<?php
+// MySQL connection
+$servername = "localhost";
+$username = "your_username";
+$password = "your_password";
+$dbname = "your_database_name";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// CRUD operations
+// Insert
+$sql = "INSERT INTO your_table_name (column1, column2, ...) VALUES ('value1', 'value2', ...)";
+$conn->query($sql);
+
+// Read
+$sql = "SELECT * FROM your_table_name";
+$result = $conn->query($sql);
+while ($row = $result->fetch_assoc()) {
+    var_dump($row);
+}
+
+// Update
+$sql = "UPDATE your_table_name SET column1='new_value' WHERE your_condition";
+$conn->query($sql);
+
+// Delete
+$sql = "DELETE FROM your_table_name WHERE your_condition";
+$conn->query($sql);
+
+$conn->close();
+?>
+
+
+python 
+
+import mysql.connector
+
+# MySQL connection
+conn = mysql.connector.connect(
+    host="localhost",
+    user="your_username",
+    password="your_password",
+    database="your_database_name"
+)
+
+cursor = conn.cursor()
+
+# CRUD operations
+# Insert
+sql = "INSERT INTO your_table_name (column1, column2, ...) VALUES (%s, %s, ...)"
+values = ('value1', 'value2', ...)
+cursor.execute(sql, values)
+conn.commit()
+
+# Read
+sql = "SELECT * FROM your_table_name"
+cursor.execute(sql)
+for row in cursor.fetchall():
+    print(row)
+
+# Update
+sql = "UPDATE your_table_name SET column1='new_value' WHERE your_condition"
+cursor.execute(sql)
+conn.commit()
+
+# Delete
+sql = "DELETE FROM your_table_name WHERE your_condition"
+cursor.execute(sql)
+conn.commit()
+
+conn.close()
+
+
+java
+
+import java.sql.*;
+
+// MySQL connection
+String url = "jdbc:mysql://localhost:3306/your_database_name";
+String user = "your_username";
+String password = "your_password";
+
+Connection connection = DriverManager.getConnection(url, user, password);
+
+// CRUD operations
+// Insert
+Statement insertStatement = connection.createStatement();
+String insertQuery = "INSERT INTO your_table_name (column1, column2, ...) VALUES ('value1', 'value2', ...)";
+insertStatement.executeUpdate(insertQuery);
+
+// Read
+Statement readStatement = connection.createStatement();
+String readQuery = "SELECT * FROM your_table_name";
+ResultSet resultSet = readStatement.executeQuery(readQuery);
+while (resultSet.next()) {
+    System.out.println(resultSet.getString("column1") + ", " + resultSet.getString("column2") + ", ...");
+}
+
+// Update
+Statement updateStatement = connection.createStatement();
+String updateQuery = "UPDATE your_table_name SET column1='new_value' WHERE your_condition";
+updateStatement.executeUpdate(updateQuery);
+
+// Delete
+Statement deleteStatement = connection.createStatement();
+String deleteQuery = "DELETE FROM your_table_name WHERE your_condition";
+deleteStatement.executeUpdate(deleteQuery);
+
+connection.close();
